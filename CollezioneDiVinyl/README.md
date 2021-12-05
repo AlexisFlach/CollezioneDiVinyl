@@ -25,7 +25,7 @@ private readonly List<Vinyl> _repository = new()
         };
 ```
 
-Tänk nu att vi befinner oss i vår webbläsare och vill skapa en ny Vinyl. Vi har ett formulär och skriver in informationen vi vill associera med vår entity:
+Tänk nu attvi ska skapa en ny Vinyl. Vi har ett formulär och skriver in informationen vi vill associera med vår entity:
 
 ```
 Id: 1
@@ -87,6 +87,88 @@ public class CreateVinylDto
     return CreatedAtAction(nameof(GetVinyl), new { id = vinyl.Id }, vinyl);
 ```
 
+Problemet här att vi fortfarande skickar tillbaka vår vinyl. Vad vi vill är att endast exponera våra DTOs.
+
+
+
+**Dtos/VinylDtos.cs**
+
+```
+    public class VinylDto
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public int Artist { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+```
+
+```
+     [HttpGet]
+        public IEnumerable<VinylDto> GetVinyls()
+        {
+            var vinyls = _repository.GetVinyls().Select(item => new VinylDto()
+            {
+                Id = item.Id,
+                Title = item.Title,
+                Artist = item.Artist,
+                CreatedAt = item.CreatedAt,
+            });
+            return vinyls;
+        }
+```
+
+Istället för att konvertera våra **Vinyl** till **VinylDto** på detta sätt på varje ställe så kan vi istället använda oss av extension methods.
+
+**Extensions.cs**
+
+```
+        public static class Extensions
+        {
+        public static VinylDto AsDto(this Vinyl vinyl)
+        {
+            return new VinylDto()
+            {
+                Id = vinyl.Id,
+                Title = vinyl.Title,
+                Artist = vinyl.Artist,
+                CreatedAt = vinyl.CreatedAt,
+            };
+        }
+    }
+```
+
+```
+        [HttpGet]
+        public IEnumerable<VinylDto> GetVinyls()
+        {
+            var vinyls = _repository.GetVinyls().Select(v => v.AsDto()); 
+            return vinyls;
+        }
+```
+
+Extension methods enable you to "add" methods to existing types without creating a new derived type, recompiling, or otherwise modifying the original type. Extension methods are static methods, but they're called as if they were instance methods on the extended type. 
+
+https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/extension-methods
+
+Vi kan nu göra samma sak när vi returnerar en unik Vinyl.
+
+```
+    [HttpGet("{id}")]
+        public ActionResult<VinylDto> GetVinyl(int id)
+        {
+            var vinyl = _repository.GetVinyl(id);
+
+            if(vinyl == null)
+            {
+                return NotFound();
+            }
+            return Ok(vinyl.AsDto());
+        }  
+```
+
+
+
 **Dtos/UpdateVinylDto.cs**
 
 ```
@@ -113,5 +195,25 @@ public ActionResult UpdateVinyl(UpdateVinylDto v, int id)
             return Ok();
         }
 
+```
+
+Nu kan vi gå tillbaka till vår Post route.
+
+```
+     [HttpPost]
+        public ActionResult<Vinyl> AddVinyl(CreateVinylDto v)
+        {
+            Vinyl vinyl = new()
+            {
+                Artist = v.Artist,
+                Title = v.Title,
+            };
+            Random random = new Random();
+
+            vinyl.Id = random.Next(1, 255);
+            vinyl.CreatedAt = DateTime.Now;
+            _repository.AddVinyl(vinyl);
+            return CreatedAtAction(nameof(GetVinyl), new { id = vinyl.Id }, vinyl.AsDto());
+        }
 ```
 

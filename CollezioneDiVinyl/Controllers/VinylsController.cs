@@ -17,18 +17,18 @@ namespace CollezioneDiVinyl.Controllers
 
         public VinylsController(IVinylsRepository repository)
         {
-            _repository = repository;
+            _repository = repository;   
         }
 
         [HttpGet]
-        public IEnumerable<Vinyl> GetVinyls()
+        public IEnumerable<VinylDto> GetVinyls()
         {
-            var vinyls = _repository.GetVinyls();
+            var vinyls = _repository.GetVinyls().Select(v => v.AsDto()); 
             return vinyls;
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Vinyl> GetVinyl(int id)
+        public ActionResult<VinylDto> GetVinyl(int id)
         {
             var vinyl = _repository.GetVinyl(id);
 
@@ -36,7 +36,7 @@ namespace CollezioneDiVinyl.Controllers
             {
                 return NotFound();
             }
-            return Ok(vinyl);
+            return Ok(vinyl.AsDto());
         }
 
         [HttpPut("{id}")]
@@ -69,8 +69,9 @@ namespace CollezioneDiVinyl.Controllers
             vinyl.Id = random.Next(1, 255);
             vinyl.CreatedAt = DateTime.Now;
             _repository.AddVinyl(vinyl);
-            return CreatedAtAction(nameof(GetVinyl), new { id = vinyl.Id }, v);
+            return CreatedAtAction(nameof(GetVinyl), new { id = vinyl.Id }, vinyl.AsDto());
         }
+
         [HttpDelete("{id}")]
 
         public ActionResult DeleteVinyl(int id)
