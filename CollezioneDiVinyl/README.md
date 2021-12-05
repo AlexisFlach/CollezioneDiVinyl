@@ -98,7 +98,7 @@ public class CreateVinylDto
 ```
 
 ```
-  public ActionResult UpdateVinyl(UpdateVinylDto v, int id)
+public ActionResult UpdateVinyl(UpdateVinylDto v, int id)
         {
             var existingItem = _repository.GetVinyl(id);
             if(existingItem == null)
