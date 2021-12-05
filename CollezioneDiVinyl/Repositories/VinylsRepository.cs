@@ -13,7 +13,7 @@ namespace CollezioneDiVinyl.Repositories
         {
             new() { Id = 1, Artist = 1, Title = "Hard Rain", CreatedAt=DateTime.Now },
             new() { Id = 2, Artist = 1, Title = "John Wesley Harding", CreatedAt = DateTime.Now },
-            new() { Id = 3, Artist = 2, Title = "12", CreatedAt = DateTime.Now },
+            new() { Id = 3, Artist = 2, Title = "12", CreatedAt = DateTime.Now  },
         };
 
         public IEnumerable<Vinyl> GetVinyls()

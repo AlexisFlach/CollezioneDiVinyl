@@ -41,7 +41,7 @@ namespace CollezioneDiVinyl.Controllers
 
         [HttpPut("{id}")]
 
-        public ActionResult UpdateVinyl(Vinyl v, int id)
+        public ActionResult UpdateVinyl(UpdateVinylDto v, int id)
         {
             var existingItem = _repository.GetVinyl(id);
             if(existingItem == null)
@@ -69,7 +69,7 @@ namespace CollezioneDiVinyl.Controllers
             vinyl.Id = random.Next(1, 255);
             vinyl.CreatedAt = DateTime.Now;
             _repository.AddVinyl(vinyl);
-            return CreatedAtAction(nameof(GetVinyl), new { id = vinyl.Id }, vinyl);
+            return CreatedAtAction(nameof(GetVinyl), new { id = vinyl.Id }, v);
         }
         [HttpDelete("{id}")]
 
