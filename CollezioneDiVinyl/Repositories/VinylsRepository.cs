@@ -1,5 +1,6 @@
 ﻿using CollezioneDiVinyl.Entities;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,12 +11,11 @@ namespace CollezioneDiVinyl.Repositories
 
         private readonly List<Vinyl> _repository = new()
         {
-            new() { Id = 1, Artist = "Bob Dylan", Title = "Hard Rain" },
-            new() { Id = 2, Artist = "Bob Dylan", Title = "John Wesley Harding" },
-            new() { Id = 3, Artist = "Flamingokvintetten", Title = "12" },
+            new() { Id = 1, Artist = 1, Title = "Hard Rain", CreatedAt=DateTime.Now },
+            new() { Id = 2, Artist = 1, Title = "John Wesley Harding", CreatedAt = DateTime.Now },
+            new() { Id = 3, Artist = 2, Title = "12", CreatedAt = DateTime.Now },
         };
 
-  
         public IEnumerable<Vinyl> GetVinyls()
         {
             return _repository;

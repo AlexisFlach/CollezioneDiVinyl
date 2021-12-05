@@ -1,7 +1,9 @@
 ﻿using CollezioneDiVinyl.Entities;
+using CollezioneDiVinyl.Dtos;
 using CollezioneDiVinyl.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -55,14 +57,17 @@ namespace CollezioneDiVinyl.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Vinyl> AddVinyl(Vinyl v)
+        public ActionResult<Vinyl> AddVinyl(CreateVinylDto v)
         {
             Vinyl vinyl = new()
             {
-                Id = v.Id,
                 Artist = v.Artist,
                 Title = v.Title,
             };
+            Random random = new Random();
+
+            vinyl.Id = random.Next(1, 255);
+            vinyl.CreatedAt = DateTime.Now;
             _repository.AddVinyl(vinyl);
             return CreatedAtAction(nameof(GetVinyl), new { id = vinyl.Id }, vinyl);
         }
